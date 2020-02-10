@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Pokemon_TGC_Compendium.Entities;
+using System;
 using System.Text;
 
 namespace Pokemon_TGC_Compendium
@@ -8,24 +9,21 @@ namespace Pokemon_TGC_Compendium
         static void Main(string[] args)
         {
             //Console.WriteLine("Hello World!");
-            char chooseSN = 'n';
+            int chooseSN;
+            string nodeButtonTCG = string.Empty;
+            string url = "https://www.pokemon.com/us/pokemon-tcg/pokemon-cards/";
 
             StringBuilder sbString = new StringBuilder();
             sbString.AppendLine("Caso de estudo - Compendio das informações simplificadas do Pokemon Trading Card Game, ");
-            sbString.AppendLine("capturado via web scraping no site do respectivo game.");
-            sbString.Append("Deseja iniciar extração dos dados? (S/N): ");
+            sbString.AppendLine("1 - Acesse o site https://www.pokemon.com/us/pokemon-tcg/pokemon-cards/");
+            sbString.AppendLine("2 - Realize uma pesquisa sem preencher nenhum campo (Search)");
+            sbString.AppendLine("3 - Informa abaixo a quantidade de páginas:");
             Console.Write(sbString);
 
-            chooseSN = char.Parse(Console.ReadLine());
+            chooseSN = int.Parse(Console.ReadLine());
 
-            if(chooseSN=='n')
-            {
-                Console.WriteLine("Obrigado!\n");
-            }
-            else
-            {
-                new RunScrapingPage();
-            }
+            TCGScrapingPage tcg = new TCGScrapingPage(url, nodeButtonTCG,chooseSN);
+            tcg.RunGetPages();
         }
     }
 }

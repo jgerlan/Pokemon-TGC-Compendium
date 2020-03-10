@@ -9,6 +9,7 @@ using System.Drawing.Imaging;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Threading;
+using Pokemon_TGC_Compendium.Business;
 
 namespace Pokemon_TGC_Compendium.ProducerConsumer
 {
@@ -87,12 +88,27 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
             return listPokemonCard;
         }
 
-        public void ConsumerCardInfo(List<PokemonCard> listPokemonCard)
+        public void ConsumerCardInfo(List<PokemonCard> listPokemonCard, bool chooseSingleFile)
         {
-
+            string pokecardInfo = string.Empty;
+            if (chooseSingleFile)
+            {
+                pokecardInfo = JsonConvert.SerializeObject(listPokemonCard);
+                PokemonCardBUS pokemonBUS = new PokemonCardBUS();
+                pokemonBUS.pokemonCardDAO.createPokemonCardInfoFile(pokecardInfo, "PokemonCardInfoCompedium");
+            }
+            else
+            {
+                foreach (var cardInfo in listPokemonCard)
+                {
+                    pokecardInfo = JsonConvert.SerializeObject(cardInfo);
+                    PokemonCardBUS pokemonBUS = new PokemonCardBUS();
+                    pokemonBUS.pokemonCardDAO.createPokemonCardInfoFile(pokecardInfo, cardInfo.name);
+                }
+            }
         }
 
-        public void RunFlow(int nPages)
+        public void RunFlow(int nPages, bool chooseSN)
         {
             /*PokemonCard teste = new PokemonCard()
             {
@@ -102,18 +118,42 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
                 urlImage = "https://assets.pokemon.com/assets/cms2/img/cards/web/SM35/SM35_EN_1.png"
             };
             List<PokemonCard> listTeste = new List<PokemonCard>();
-            listTeste.Add(teste);*/
+            listTeste.Add(teste);
             List<string> testeLinkImage = new List<string>()
             {
                 "https://www.pokemon.com/us/pokemon-tcg/pokemon-cards/sm-series/sm35/1/",
                 "https://www.pokemon.com/us/pokemon-tcg/pokemon-cards/ex-series/ex4/46/",
                 "https://www.pokemon.com/us/pokemon-tcg/pokemon-cards/sm-series/sma/SV6/"
-            };
+            };*/
 
-            //List<string> listCardLink = Produce(nPages);
-            MountCardInfo(testeLinkImage);
-            //ConsumerCardInfo(listTeste);
+            List<string> returnProduce;
+            List<PokemonCard> returnMountCardInfo;
 
+
+            returnProduce = Produce(nPages);
+            returnMountCardInfo = MountCardInfo(returnProduce);
+            ConsumerCardInfo(returnMountCardInfo, chooseSN);
+
+        }
+
+        public int NumberOfPages()
+        {
+            string mainUrl = "https://www.pokemon.com/us/pokemon-tcg/pokemon-cards/";
+            string queryString = string.Format("?cardName=&cardText=&evolvesFrom=&simpleSubmit=&format=unlimited&hitPointsMin=0&hitPointsMax=340&retreatCostMin=0&retreatCostMax=5&totalAttackCostMin=0&totalAttackCostMax=5&particularArtist");
+            HtmlWeb page = new HtmlWeb();
+            string rangePages = page.Load(mainUrl + queryString).DocumentNode.SelectSingleNode("//div[@id=\"cards-load-more\"]/div/span").InnerText;
+            int numberPages;
+
+            try
+            {
+                numberPages = int.Parse(rangePages.Substring(5));
+                return numberPages;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+   
         }
     }
 }

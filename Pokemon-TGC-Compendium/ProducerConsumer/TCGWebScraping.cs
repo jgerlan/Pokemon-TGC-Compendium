@@ -1,14 +1,14 @@
 ﻿using HtmlAgilityPack;
+using Newtonsoft.Json;
 using Pokemon_TGC_Compendium.Entities;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
-using System.Net;
 using System.Text;
+using System.Drawing.Imaging;
+using System.Drawing;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
+using System.Threading;
 
 namespace Pokemon_TGC_Compendium.ProducerConsumer
 {
@@ -55,16 +55,33 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
             List<PokemonCard> listPokemonCard = new List<PokemonCard>();
 
 
-            foreach (string cardLink in listCardLinks)
+            //foreach (string cardLink in listCardLinks)
+            Parallel.ForEach(listCardLinks, (cardLink) =>
             {
+                Console.WriteLine($"Processing {cardLink} on thread {Thread.CurrentThread.ManagedThreadId}");
+
                 PokemonCard newCardPokemonInfo = new PokemonCard();
                 HtmlDocument pageCardInfo = getCardInfoHtml.Load(cardLink);//.DocumentNode.SelectNodes("//div[@class=\"content-block content-block-full\"]/ul[@class=\"cards-grid clear\"]/li/a[@href]");
                 newCardPokemonInfo.numbering = pageCardInfo.DocumentNode.SelectSingleNode("//div[@class=\"stats-footer\"]/span").InnerText;
                 newCardPokemonInfo.name = pageCardInfo.DocumentNode.SelectSingleNode("//div[@class=\"card-description\"]/div[@class=\"color-block color-block-gray\"]/h1").InnerText;
                 newCardPokemonInfo.expansion = pageCardInfo.DocumentNode.SelectSingleNode("//div[@class=\"stats-footer\"]/h3/a").InnerText;
                 newCardPokemonInfo.urlImage = pageCardInfo.DocumentNode.SelectSingleNode("//div[@class=\"column-6 push-1\"]/div[@class=\"content-block content-block-full card-image\"]/img").GetAttributeValue("src", string.Empty);
+
+                System.Net.WebRequest request = System.Net.WebRequest.Create(newCardPokemonInfo.urlImage);
+                System.Net.WebResponse response = request.GetResponse();
+                Stream responseStream = response.GetResponseStream();
+
+                Image bm = new Bitmap(responseStream);
+                ImageFormat format = ImageFormat.Png;
+
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    bm.Save(ms, format);
+                    newCardPokemonInfo.codedImage = Convert.ToBase64String(ms.ToArray());
+                }
+
                 listPokemonCard.Add(newCardPokemonInfo);
-            }
+            });
 
 
             return listPokemonCard;
@@ -77,7 +94,7 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
 
         public void RunFlow(int nPages)
         {
-            PokemonCard teste = new PokemonCard()
+            /*PokemonCard teste = new PokemonCard()
             {
                 numbering = "1/73 Common",
                 name = "Bulbassauro",
@@ -85,10 +102,17 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
                 urlImage = "https://assets.pokemon.com/assets/cms2/img/cards/web/SM35/SM35_EN_1.png"
             };
             List<PokemonCard> listTeste = new List<PokemonCard>();
-            listTeste.Add(teste);
+            listTeste.Add(teste);*/
+            List<string> testeLinkImage = new List<string>()
+            {
+                "https://www.pokemon.com/us/pokemon-tcg/pokemon-cards/sm-series/sm35/1/",
+                "https://www.pokemon.com/us/pokemon-tcg/pokemon-cards/ex-series/ex4/46/",
+                "https://www.pokemon.com/us/pokemon-tcg/pokemon-cards/sm-series/sma/SV6/"
+            };
+
             //List<string> listCardLink = Produce(nPages);
-            //MountCardInfo(teste);
-            ConsumerCardInfo(listTeste);
+            MountCardInfo(testeLinkImage);
+            //ConsumerCardInfo(listTeste);
 
         }
     }

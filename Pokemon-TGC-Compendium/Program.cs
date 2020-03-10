@@ -12,7 +12,7 @@ namespace Pokemon_TGC_Compendium
             //Console.WriteLine("Hello World!");
             int chooseSN;
             string nodeButtonTCG = string.Empty;
-            string url = "https://www.pokemon.com/us/pokemon-tcg/pokemon-cards/";
+            //string url = "https://www.pokemon.com/us/pokemon-tcg/pokemon-cards/";
 
             StringBuilder sbString = new StringBuilder();
             sbString.AppendLine("Caso de estudo - Compendio das informações simplificadas do Pokemon Trading Card Game, ");

@@ -1,4 +1,5 @@
 ﻿using Pokemon_TGC_Compendium.Entities;
+using Pokemon_TGC_Compendium.ProducerConsumer;
 using System;
 using System.Text;
 
@@ -22,8 +23,9 @@ namespace Pokemon_TGC_Compendium
 
             chooseSN = int.Parse(Console.ReadLine());
 
-            TCGScrapingPage tcg = new TCGScrapingPage(url, nodeButtonTCG,chooseSN);
-            tcg.RunGetPages();
+            TCGWebScraping tcgDois = new TCGWebScraping();
+            tcgDois.RunFlow(chooseSN);
+
         }
     }
 }

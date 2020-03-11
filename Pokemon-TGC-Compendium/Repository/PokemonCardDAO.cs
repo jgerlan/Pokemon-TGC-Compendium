@@ -17,7 +17,7 @@ namespace Pokemon_TGC_Compendium.Repository
 					DirectoryInfo dir = Directory.CreateDirectory(path);
 				}
 
-				using (StreamWriter writer = new StreamWriter(path + "\\"+nameFile+".json", true))
+				using (StreamWriter writer = new StreamWriter(path + "\\"+nameFile+ ".json", true))
 				{
 					writer.WriteLine(content);
 				}

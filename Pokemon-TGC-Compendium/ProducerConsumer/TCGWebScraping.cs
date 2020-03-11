@@ -24,9 +24,29 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
             List<HtmlDocument> pages = new List<HtmlDocument>();
             List<string> listCardLinks = new List<string>();
 
+            List<string> listLinkPages = new List<string>();
+            listLinkPages.Add(mainUrl + queryString);
+            if (nPages>1)
+            {
+                for (int i = 2; i <= nPages; i++)
+                {
+                    listLinkPages.Add(mainUrl + i + queryString);
+                }
+            }
+
             try
             {
                 string tempUrl = mainUrl.Substring(0, 23);
+
+                foreach (string link in listLinkPages)
+                {
+                    foreach (HtmlNode tagLink in page.Load(link).DocumentNode.SelectNodes("//div[@class=\"content-block content-block-full\"]/ul[@class=\"cards-grid clear\"]/li/a[@href]"))
+                    {
+                        string linkCard = tagLink.GetAttributeValue("href", string.Empty);
+                        listCardLinks.Add(tempUrl + linkCard);
+                    }
+                }
+                /*
                 foreach (HtmlNode tagLink in page.Load(mainUrl + queryString).DocumentNode.SelectNodes("//div[@class=\"content-block content-block-full\"]/ul[@class=\"cards-grid clear\"]/li/a[@href]"))
                 {
                     string linkCard = tagLink.GetAttributeValue("href", string.Empty);
@@ -40,7 +60,7 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
                             string linkCard = tagLink.GetAttributeValue("href", string.Empty);
                             listCardLinks.Add(tempUrl + linkCard);
                         }
-                    }
+                    }*/
             }
             catch (Exception ex)
             {
@@ -95,15 +115,18 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
             {
                 pokecardInfo = JsonConvert.SerializeObject(listPokemonCard);
                 PokemonCardBUS pokemonBUS = new PokemonCardBUS();
-                pokemonBUS.pokemonCardDAO.createPokemonCardInfoFile(pokecardInfo, "PokemonCardInfoCompedium");
+                pokemonBUS.pokemonCardDAO.createPokemonCardInfoFile(pokecardInfo, "PokemonCardInfoCompedium" + "_" + DateTime.Now.ToString("yyyyMMddHHmmss"));
             }
             else
             {
+                int numberFile = 0;
                 foreach (var cardInfo in listPokemonCard)
                 {
+                    numberFile++;
                     pokecardInfo = JsonConvert.SerializeObject(cardInfo);
                     PokemonCardBUS pokemonBUS = new PokemonCardBUS();
-                    pokemonBUS.pokemonCardDAO.createPokemonCardInfoFile(pokecardInfo, cardInfo.name);
+                    string nameFileCardInfo = cardInfo.name +"_"+numberFile;
+                    pokemonBUS.pokemonCardDAO.createPokemonCardInfoFile(pokecardInfo, nameFileCardInfo);
                 }
             }
         }

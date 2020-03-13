@@ -17,6 +17,9 @@ namespace Pokemon_TGC_Compendium
             TCGWebScraping tcgDois = new TCGWebScraping();
             var numberTotalPages = 845;//tcgDois.NumberOfPages();
 
+            TGCWebScrapingProduceConsumer test = new TGCWebScrapingProduceConsumer();
+            test.RunFlow(2, true);
+
             StringBuilder sbString = new StringBuilder();
             sbString.AppendLine("Caso de estudo - Compendio das informações simplificadas do Pokemon Trading Card Game, ");
             sbString.AppendLine("1 - Acesse o site https://www.pokemon.com/us/pokemon-tcg/pokemon-cards/");

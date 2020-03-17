@@ -33,22 +33,23 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
             List<string> listCardLinks = new List<string>();
             List<string> listLinkPages = ListPages(nPages);
 
-            Task Produce = Task.Run(() => {
-            try
+            Task Produce = Task.Run(() =>
             {
-                string tempUrl = mainUrl.Substring(0, 23);
-
-                foreach (string link in listLinkPages)
+                try
                 {
+                    string tempUrl = mainUrl.Substring(0, 23);
+
+                    foreach (string link in listLinkPages)
+                    {
                         var pagTemp = page.Load(link).DocumentNode.SelectNodes("//div[@class=\"content-block content-block-full\"]/ul[@class=\"cards-grid clear\"]/li/a[@href]");
                         Parallel.ForEach(pagTemp, (tagLink) =>
                         //foreach (HtmlNode tagLink in page.Load(link).DocumentNode.SelectNodes("//div[@class=\"content-block content-block-full\"]/ul[@class=\"cards-grid clear\"]/li/a[@href]"))
                         {
-                        string linkCard = tagLink.GetAttributeValue("href", string.Empty);
-                        //listCardLinks.Add(tempUrl + linkCard);
-                        queueProduceToMount.Add(tempUrl + linkCard);
-                        Console.WriteLine("Add item {0} on queueProduceToMount.", tempUrl + linkCard);
-                    });
+                            string linkCard = tagLink.GetAttributeValue("href", string.Empty);
+                            //listCardLinks.Add(tempUrl + linkCard);
+                            queueProduceToMount.Add(tempUrl + linkCard);
+                            Console.WriteLine("Add item {0} on queueProduceToMount.", tempUrl + linkCard);
+                        });
                     }
                     queueProduceToMount.CompleteAdding();
                 }
@@ -59,11 +60,10 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
                 }
             });
 
-            Task Mount = Task.Run(() => {
-
+            Task Mount = Task.Run(() =>
+            {
                 HtmlWeb getCardInfoHtml = new HtmlWeb();
                 //List<PokemonCard> listPokemonCard = new List<PokemonCard>();
-
 
                 //foreach (string cardLink in queueProduceToMount.GetConsumingEnumerable())
                 Parallel.ForEach(queueProduceToMount.GetConsumingEnumerable(), (cardLink) =>
@@ -99,48 +99,31 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
 
             });
 
-            Task Consume = Task.Run(() => {
-
+            Task Consume = Task.Run(() =>
+            {
                 string pokecardInfo = string.Empty;
                 string data = DateTime.Now.ToString("yyyyMMddHHmmss");
                 PokemonCardBUS pokemonBUS = new PokemonCardBUS();
 
-                int NumberOfRetries = 3;
-                int DelayOnRetry = 1000;
-
                 if (chooseSN)
                 {
-                    pokemonBUS.pokemonCardDAO.createPokemonCardInfoFile("[", "PokemonCardInfoCompedium" + "_" + data);
+                    pokemonBUS.pokemonCardDAO.CreatePokemonCardInfoFile("[", "PokemonCardInfoCompedium" + "_" + data);
+                    //await pokemonBUS.pokemonCardDAO.CreatePokemonCardInfoFileAsync("[", "PokemonCardInfoCompedium" + "_" + data, TimeSpan.FromSeconds(2), tryCount:10);
 
                     //foreach (var pokecardInfoObj in queueMountToConsumer.GetConsumingEnumerable())
-                    Parallel.ForEach(queueMountToConsumer.GetConsumingEnumerable(), (pokecardInfoObj) =>
+                    Parallel.ForEach(queueMountToConsumer.GetConsumingEnumerable(), async (pokecardInfoObj) =>
                     {
                         pokecardInfo = JsonConvert.SerializeObject(pokecardInfoObj);
-                        for (int i = 1; i <= NumberOfRetries; ++i)
+                        string virg = ",";
+                        if (queueMountToConsumer.IsCompleted)
                         {
-                            try
-                            {
-                                // Do stuff with file
-                                //PokemonCardBUS pokemonBUS = new PokemonCardBUS();
-                                string virg = ",";
-                                if (queueMountToConsumer.IsCompleted)
-                                {
-                                    virg = string.Empty;
-                                }
-                                pokemonBUS.pokemonCardDAO.createPokemonCardInfoFile(pokecardInfo + virg, "PokemonCardInfoCompedium" + "_" + data);
-
-                                break; // When done we can break loop
-                            }
-                            catch (IOException) when (i <= NumberOfRetries)
-                            {
-                                // You may check error code to filter some exceptions, not every error
-                                // can be recovered.
-                                Thread.Sleep(DelayOnRetry);
-                            }
+                            virg = string.Empty;
                         }
+                        //pokemonBUS.pokemonCardDAO.CreatePokemonCardInfoFile(pokecardInfo + virg, "PokemonCardInfoCompedium" + "_" + data);
+                        await pokemonBUS.pokemonCardDAO.CreatePokemonCardInfoFileAsync(pokecardInfo + virg, "PokemonCardInfoCompedium" + "_" + data);
 
                     });
-                    pokemonBUS.pokemonCardDAO.createPokemonCardInfoFile("]", "PokemonCardInfoCompedium" + "_" + data);
+                    pokemonBUS.pokemonCardDAO.CreatePokemonCardInfoFile("]", "PokemonCardInfoCompedium" + "_" + data);
                 }
                 else
                 {
@@ -152,7 +135,7 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
                         pokecardInfo = JsonConvert.SerializeObject(pokecardInfoObj);
                         //PokemonCardBUS pokemonBUS = new PokemonCardBUS();
                         string nameFileCardInfo = pokecardInfoObj.name + "_" + numberFile;
-                        pokemonBUS.pokemonCardDAO.createPokemonCardInfoFile(pokecardInfo, nameFileCardInfo);
+                        pokemonBUS.pokemonCardDAO.CreatePokemonCardInfoFile(pokecardInfo, nameFileCardInfo);
                     });
                 }
 
@@ -178,5 +161,26 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
 
             return listLinkPages;
         }
+
+        public int NumberOfPages()
+        {
+            string mainUrl = "https://www.pokemon.com/us/pokemon-tcg/pokemon-cards/";
+            string queryString = string.Format("?cardName=&cardText=&evolvesFrom=&simpleSubmit=&format=unlimited&hitPointsMin=0&hitPointsMax=340&retreatCostMin=0&retreatCostMax=5&totalAttackCostMin=0&totalAttackCostMax=5&particularArtist");
+            HtmlWeb page = new HtmlWeb();
+            string rangePages = page.Load(mainUrl + queryString).DocumentNode.SelectSingleNode("//div[@id=\"cards-load-more\"]/div/span").InnerText;
+            int numberPages;
+
+            try
+            {
+                numberPages = int.Parse(rangePages.Substring(5));
+                return numberPages;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+        }
+
     }
 }

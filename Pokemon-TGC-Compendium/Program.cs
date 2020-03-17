@@ -14,11 +14,9 @@ namespace Pokemon_TGC_Compendium
             bool chooseSN = true;
             string chooseSNCond = string.Empty;
             //string url = "https://www.pokemon.com/us/pokemon-tcg/pokemon-cards/";
-            TCGWebScraping tcgDois = new TCGWebScraping();
-            var numberTotalPages = 845;//tcgDois.NumberOfPages();
-
-            TGCWebScrapingProduceConsumer test = new TGCWebScrapingProduceConsumer();
-            test.RunFlow(1, true);
+            //TCGWebScraping tcgSingle = new TCGWebScraping();
+            TGCWebScrapingProduceConsumer tgcPDAsync = new TGCWebScrapingProduceConsumer();
+            var numberTotalPages = 845;//tcgSingle.NumberOfPages();
 
             StringBuilder sbString = new StringBuilder();
             sbString.AppendLine("Caso de estudo - Compendio das informações simplificadas do Pokemon Trading Card Game, ");
@@ -46,8 +44,8 @@ namespace Pokemon_TGC_Compendium
                         Console.WriteLine("Você digitou uma opção inválida, por favor tente novamente com uma opção válida!");
                     }
 
-                    tcgDois.RunFlow(chooseNumberPages, chooseSN);
-
+                    //tcgSingle.RunFlow(chooseNumberPages, chooseSN);
+                    tgcPDAsync.RunFlow(chooseNumberPages, chooseSN);
                 }
                 else
                 {

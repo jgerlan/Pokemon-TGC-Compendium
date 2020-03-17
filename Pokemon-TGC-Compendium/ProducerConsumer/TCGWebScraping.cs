@@ -76,10 +76,10 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
             List<PokemonCard> listPokemonCard = new List<PokemonCard>();
 
 
-            //foreach (string cardLink in listCardLinks)
-            Parallel.ForEach(listCardLinks, (cardLink) =>
+            foreach (string cardLink in listCardLinks)
+            //Parallel.ForEach(listCardLinks, (cardLink) =>
             {
-                Console.WriteLine($"Processing {cardLink} on thread {Thread.CurrentThread.ManagedThreadId}");
+                //Console.WriteLine($"Processing {cardLink} on thread {Thread.CurrentThread.ManagedThreadId}");
 
                 PokemonCard newCardPokemonInfo = new PokemonCard();
                 HtmlDocument pageCardInfo = getCardInfoHtml.Load(cardLink);//.DocumentNode.SelectNodes("//div[@class=\"content-block content-block-full\"]/ul[@class=\"cards-grid clear\"]/li/a[@href]");
@@ -102,7 +102,7 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
                 }
 
                 listPokemonCard.Add(newCardPokemonInfo);
-            });
+            }//);
 
 
             return listPokemonCard;
@@ -115,7 +115,7 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
             {
                 pokecardInfo = JsonConvert.SerializeObject(listPokemonCard);
                 PokemonCardBUS pokemonBUS = new PokemonCardBUS();
-                pokemonBUS.pokemonCardDAO.createPokemonCardInfoFile(pokecardInfo, "PokemonCardInfoCompedium" + "_" + DateTime.Now.ToString("yyyyMMddHHmmss"));
+                pokemonBUS.pokemonCardDAO.CreatePokemonCardInfoFile(pokecardInfo, "PokemonCardInfoCompedium" + "_" + DateTime.Now.ToString("yyyyMMddHHmmss"));
             }
             else
             {
@@ -126,7 +126,7 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
                     pokecardInfo = JsonConvert.SerializeObject(cardInfo);
                     PokemonCardBUS pokemonBUS = new PokemonCardBUS();
                     string nameFileCardInfo = cardInfo.name +"_"+numberFile;
-                    pokemonBUS.pokemonCardDAO.createPokemonCardInfoFile(pokecardInfo, nameFileCardInfo);
+                    pokemonBUS.pokemonCardDAO.CreatePokemonCardInfoFile(pokecardInfo, nameFileCardInfo);
                 }
             }
         }

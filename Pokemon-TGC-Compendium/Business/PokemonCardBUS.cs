@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Pokemon_TGC_Compendium.Business
 {
@@ -14,9 +15,14 @@ namespace Pokemon_TGC_Compendium.Business
             pokemonCardDAO = new PokemonCardDAO();
         }
 
-        public void createcreatePokemonCardInfoFile(string content, string nameFile)
+        public void CreatePokemonCardInfoFile(string content, string nameFile)
         {
-            pokemonCardDAO.createPokemonCardInfoFile(content, nameFile);
+            pokemonCardDAO.CreatePokemonCardInfoFile(content, nameFile);
+        }
+
+        public async Task CreatePokemonCardInfoFileAsync(string content, string nameFile)
+        {
+            await pokemonCardDAO.CreatePokemonCardInfoFileAsync(content, nameFile);
         }
     }
 }

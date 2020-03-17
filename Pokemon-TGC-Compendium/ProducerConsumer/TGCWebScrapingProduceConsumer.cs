@@ -113,8 +113,8 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
                     //foreach (var pokecardInfoObj in queueMountToConsumer.GetConsumingEnumerable())
                     Parallel.ForEach(queueMountToConsumer.GetConsumingEnumerable(), async (pokecardInfoObj) =>
                     {
-                        pokecardInfo = JsonConvert.SerializeObject(pokecardInfoObj);
-                        string virg = ",";
+                        pokecardInfo = JsonConvert.SerializeObject(pokecardInfoObj, Formatting.Indented);
+                        string virg = ",\n";
                         if (queueMountToConsumer.IsCompleted)
                         {
                             virg = string.Empty;
@@ -132,7 +132,7 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
                     Parallel.ForEach(queueMountToConsumer.GetConsumingEnumerable(), (pokecardInfoObj) =>
                     {
                         numberFile++;
-                        pokecardInfo = JsonConvert.SerializeObject(pokecardInfoObj);
+                        pokecardInfo = JsonConvert.SerializeObject(pokecardInfoObj, Formatting.Indented);
                         //PokemonCardBUS pokemonBUS = new PokemonCardBUS();
                         string nameFileCardInfo = pokecardInfoObj.name + "_" + numberFile;
                         pokemonBUS.pokemonCardDAO.CreatePokemonCardInfoFile(pokecardInfo, nameFileCardInfo);

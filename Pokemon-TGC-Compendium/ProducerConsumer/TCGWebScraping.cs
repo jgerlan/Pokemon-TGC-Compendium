@@ -113,7 +113,7 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
             string pokecardInfo = string.Empty;
             if (chooseSingleFile)
             {
-                pokecardInfo = JsonConvert.SerializeObject(listPokemonCard);
+                pokecardInfo = JsonConvert.SerializeObject(listPokemonCard, Formatting.Indented);
                 PokemonCardBUS pokemonBUS = new PokemonCardBUS();
                 pokemonBUS.pokemonCardDAO.CreatePokemonCardInfoFile(pokecardInfo, "PokemonCardInfoCompedium" + "_" + DateTime.Now.ToString("yyyyMMddHHmmss"));
             }
@@ -123,7 +123,7 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
                 foreach (var cardInfo in listPokemonCard)
                 {
                     numberFile++;
-                    pokecardInfo = JsonConvert.SerializeObject(cardInfo);
+                    pokecardInfo = JsonConvert.SerializeObject(cardInfo, Formatting.Indented);
                     PokemonCardBUS pokemonBUS = new PokemonCardBUS();
                     string nameFileCardInfo = cardInfo.name +"_"+numberFile;
                     pokemonBUS.pokemonCardDAO.CreatePokemonCardInfoFile(pokecardInfo, nameFileCardInfo);

@@ -117,7 +117,7 @@ namespace Pokemon_TGC_Compendium.ProducerConsumer
                         string virg = ",\n";
                         if (queueMountToConsumer.IsCompleted)
                         {
-                            virg = string.Empty;
+                            virg = "\n";
                         }
                         //pokemonBUS.pokemonCardDAO.CreatePokemonCardInfoFile(pokecardInfo + virg, "PokemonCardInfoCompedium" + "_" + data);
                         await pokemonBUS.pokemonCardDAO.CreatePokemonCardInfoFileAsync(pokecardInfo + virg, "PokemonCardInfoCompedium" + "_" + data);

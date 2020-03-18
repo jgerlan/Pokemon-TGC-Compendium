@@ -15,7 +15,8 @@ namespace Pokemon_TGC_Compendium
             string chooseSNCond = string.Empty;
             //string url = "https://www.pokemon.com/us/pokemon-tcg/pokemon-cards/";
             //TCGWebScraping tcgSingle = new TCGWebScraping();
-            TGCWebScrapingProduceConsumer tgcPDAsync = new TGCWebScrapingProduceConsumer();
+            //TGCWebScrapingProduceConsumer tgcPDAsync = new TGCWebScrapingProduceConsumer();
+            TGCWebScrapingProdConsMethod tgcPDAMethod = new TGCWebScrapingProdConsMethod();
             var numberTotalPages = 845;//tcgSingle.NumberOfPages();
 
             StringBuilder sbString = new StringBuilder();
@@ -29,7 +30,7 @@ namespace Pokemon_TGC_Compendium
                 chooseNumberPages = int.Parse(Console.ReadLine());
                 if (chooseNumberPages >= 1)
                 {
-                    Console.Write("4 - Salvar informacoes em um único arquivo? (S/N)");
+                    Console.Write("4 - Salvar informacoes em um único arquivo? (S/N):");
                     chooseSNCond = Console.ReadLine();
                     if (chooseSNCond == "s" || chooseSNCond == "S")
                     {
@@ -45,7 +46,8 @@ namespace Pokemon_TGC_Compendium
                     }
 
                     //tcgSingle.RunFlow(chooseNumberPages, chooseSN);
-                    tgcPDAsync.RunFlow(chooseNumberPages, chooseSN);
+                    //tgcPDAsync.RunFlow(chooseNumberPages, chooseSN);
+                    tgcPDAMethod.RunFlow(chooseNumberPages, chooseSN);
                 }
                 else
                 {
